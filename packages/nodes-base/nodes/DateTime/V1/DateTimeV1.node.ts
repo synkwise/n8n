@@ -421,7 +421,7 @@ export class DateTimeV1 implements INodeType {
 				item = items[i];
 
 				if (action === 'format') {
-					let currentDate: string | number | LuxonDateTime = this.getNodeParameter(
+					let currentDate: string | number | LuxonDateTime | null = this.getNodeParameter(
 						'value',
 						i,
 					) as string;
@@ -444,7 +444,7 @@ export class DateTimeV1 implements INodeType {
 						}
 					}
 
-					if (currentDate === undefined) {
+					if (currentDate === undefined || currentDate == null) {
 						continue;
 					}
 					if (options.fromFormat === undefined && !moment(currentDate).isValid()) {

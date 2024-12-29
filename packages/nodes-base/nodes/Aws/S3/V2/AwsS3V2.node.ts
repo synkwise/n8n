@@ -1,3 +1,5 @@
+import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { paramCase, snakeCase } from 'change-case';
 import { createHash } from 'crypto';
 import type {
@@ -1016,7 +1018,13 @@ export class AwsS3V2 implements INodeType {
 								);
 							}
 							const executionData = this.helpers.constructExecutionMetaData(
-								this.helpers.returnJsonArray(responseData ?? { success: true }),
+								this.helpers.returnJsonArray(
+									responseData ?? {
+										success: true,
+										objectKey: fileName,
+										bucket: bucketName,
+									},
+								),
 								{ itemData: { item: i } },
 							);
 							returnData.push(...executionData);
@@ -1043,10 +1051,66 @@ export class AwsS3V2 implements INodeType {
 								region as string,
 							);
 							const executionData = this.helpers.constructExecutionMetaData(
-								this.helpers.returnJsonArray({ success: true }),
+								this.helpers.returnJsonArray({
+									success: true,
+									objectKey: fileName,
+									bucket: bucketName,
+								}),
 								{ itemData: { item: i } },
 							);
 							returnData.push(...executionData);
+						}
+					}
+					if (operation === 'getPresignedUrl') {
+						try {
+							// Retrieve parameters
+							const bucketName = this.getNodeParameter('bucketName', i) as string;
+							const objectKey = this.getNodeParameter('objectKey', i) as string;
+							const expirationTime = this.getNodeParameter('expirationTime', i) as number;
+
+							// Get AWS credentials
+							const credentials = await this.getCredentials('aws');
+							const region = credentials.region as string;
+
+							// Initialize S3 client
+							const s3Client = new S3Client({
+								region,
+								credentials: {
+									accessKeyId: credentials.accessKeyId as string,
+									secretAccessKey: credentials.secretAccessKey as string,
+								},
+							});
+
+							// Define command for presigned URL
+							const command = new GetObjectCommand({
+								Bucket: bucketName,
+								Key: objectKey,
+							});
+
+							// Generate presigned URL
+							const presignedUrl = await getSignedUrl(s3Client, command, {
+								expiresIn: expirationTime,
+							});
+
+							// Add the presigned URL to the output
+							const executionData = this.helpers.constructExecutionMetaData(
+								this.helpers.returnJsonArray({ presignedUrl }),
+								{ itemData: { item: i } },
+							);
+							returnData.push(...executionData);
+						} catch (error) {
+							if (this.continueOnFail()) {
+								const executionData = this.helpers.constructExecutionMetaData(
+									this.helpers.returnJsonArray({ error: error.message }),
+									{ itemData: { item: i } },
+								);
+								returnData.push(...executionData);
+								continue;
+							}
+							throw new NodeOperationError(
+								this.getNode(),
+								`Failed to generate presigned URL: ${error.message}`,
+							);
 						}
 					}
 				}

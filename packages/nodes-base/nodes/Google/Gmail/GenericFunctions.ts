@@ -287,7 +287,7 @@ export const prepareTimestamp = (
 	node: INode,
 	itemIndex: number,
 	query: string,
-	dateValue: string | number | DateTime,
+	dateValue: string | number | DateTime | null,
 	label: 'after' | 'before',
 ) => {
 	if (dateValue instanceof DateTime) {
