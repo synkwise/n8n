@@ -33,7 +33,7 @@ export const fileOperations: INodeProperties[] = [
 			{
 				name: 'Get Many',
 				value: 'getAll',
-				description: 'Get many filedds',
+				description: 'Get many file',
 				action: 'Get many files',
 			},
 			{
