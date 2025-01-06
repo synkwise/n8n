@@ -33,8 +33,14 @@ export const fileOperations: INodeProperties[] = [
 			{
 				name: 'Get Many',
 				value: 'getAll',
-				description: 'Get many files',
+				description: 'Get many file',
 				action: 'Get many files',
+			},
+			{
+				name: 'Get Presigned URL',
+				value: 'getPresignedUrl',
+				description: 'Generate a presigned URL for a file',
+				action: 'Generate a presigned URL for a file',
 			},
 			{
 				name: 'Upload',
@@ -837,5 +843,49 @@ export const fileFields: INodeProperties[] = [
 				default: '',
 			},
 		],
+	},
+	/* -------------------------------------------------------------------------- */
+	/*                                 file:getPresignedUrl                       */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Bucket Name',
+		name: 'bucketName',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['file'],
+				operation: ['getPresignedUrl'],
+			},
+		},
+		description: 'The name of the S3 bucket',
+	},
+	{
+		displayName: 'Object Key',
+		name: 'objectKey',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['file'],
+				operation: ['getPresignedUrl'],
+			},
+		},
+		description: 'The key of the object to generate the presigned URL for',
+	},
+	{
+		displayName: 'Expiration Time',
+		name: 'expirationTime',
+		type: 'number',
+		default: 3600,
+		displayOptions: {
+			show: {
+				resource: ['file'],
+				operation: ['getPresignedUrl'],
+			},
+		},
+		description: 'Expiration time of the presigned URL in seconds (default: 1 hour)',
 	},
 ];

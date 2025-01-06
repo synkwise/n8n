@@ -196,7 +196,7 @@ export async function taskUpdatePreSendAction(
 	this: IExecuteSingleFunctions,
 	requestOptions: IHttpRequestOptions,
 ): Promise<IHttpRequestOptions> {
-	const body = (requestOptions.body || {}) as { title?: string; dueDate?: string };
+	const body = (requestOptions.body || {}) as { title?: string; dueDate?: string | null };
 	if (!body.title || !body.dueDate) {
 		const contactId = this.getNodeParameter('contactId');
 		const taskId = this.getNodeParameter('taskId');

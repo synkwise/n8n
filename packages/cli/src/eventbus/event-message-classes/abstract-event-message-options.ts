@@ -7,7 +7,7 @@ import type { AbstractEventPayload } from './abstract-event-payload';
 export interface AbstractEventMessageOptions {
 	__type?: EventMessageTypeNames;
 	id?: string;
-	ts?: DateTime | string;
+	ts?: DateTime | string | null;
 	eventName: EventNamesTypes;
 	message?: string;
 	payload?: AbstractEventPayload;

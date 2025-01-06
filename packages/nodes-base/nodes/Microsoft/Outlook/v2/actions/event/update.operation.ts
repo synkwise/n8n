@@ -233,7 +233,7 @@ export async function execute(this: IExecuteFunctions, index: number) {
 	}
 
 	let startDateTime = additionalFields.start as string;
-	let endDateTime = additionalFields.end as string;
+	let endDateTime: string | null = additionalFields.end as string;
 
 	if (additionalFields.isAllDay) {
 		startDateTime =

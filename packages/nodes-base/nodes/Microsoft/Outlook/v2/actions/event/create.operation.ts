@@ -252,7 +252,7 @@ export async function execute(this: IExecuteFunctions, index: number) {
 	}
 
 	let startDateTime = this.getNodeParameter('startDateTime', index) as string;
-	let endDateTime = this.getNodeParameter('endDateTime', index) as string;
+	let endDateTime: string | null = this.getNodeParameter('endDateTime', index) as string;
 
 	if (additionalFields.isAllDay) {
 		startDateTime = DateTime.fromISO(startDateTime, { zone: timeZone }).toFormat('yyyy-MM-dd');
