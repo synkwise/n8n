@@ -337,6 +337,7 @@
       "dist/credentials/SurveyMonkeyApi.credentials.js",
       "dist/credentials/SurveyMonkeyOAuth2Api.credentials.js",
       "dist/credentials/SyncroMspApi.credentials.js",
+      "dist/credentials/SynkwiseApi.credentials.js",
       "dist/credentials/SysdigApi.credentials.js",
       "dist/credentials/TaigaApi.credentials.js",
       "dist/credentials/TapfiliateApi.credentials.js",
@@ -817,7 +818,9 @@
       "dist/nodes/Transform/RemoveDuplicates/RemoveDuplicates.node.js",
       "dist/nodes/Transform/SplitOut/SplitOut.node.js",
       "dist/nodes/Transform/Sort/Sort.node.js",
-      "dist/nodes/Transform/Summarize/Summarize.node.js"
+      "dist/nodes/Transform/Summarize/Summarize.node.js",
+      "dist/nodes/Synkwise/Synkwise.node.js",
+      "dist/nodes/Synkwise/SynkwiseTrigger.node.js"
     ]
   },
   "devDependencies": {
