@@ -71,43 +71,43 @@ export class License {
 
 		const { instanceType } = this.instanceSettings;
 		const isMainInstance = instanceType === 'main';
-		const server = this.globalConfig.license.serverUrl;
-		const offlineMode = !isMainInstance;
-		const autoRenewOffset = this.globalConfig.license.autoRenewOffset;
-		const saveCertStr = isMainInstance
-			? async (value: TLicenseBlock) => await this.saveCertStr(value)
-			: async () => {};
-		const onFeatureChange = isMainInstance
-			? async (features: TFeatures) => await this.onFeatureChange(features)
-			: async () => {};
-		const collectUsageMetrics = isMainInstance
-			? async () => await this.licenseMetricsService.collectUsageMetrics()
-			: async () => [];
-		const collectPassthroughData = isMainInstance
-			? async () => await this.licenseMetricsService.collectPassthroughData()
-			: async () => ({});
-
-		const renewalEnabled = this.renewalEnabled();
+		// const server = this.globalConfig.license.serverUrl;
+		// const offlineMode = !isMainInstance;
+		// const autoRenewOffset = this.globalConfig.license.autoRenewOffset;
+		// const saveCertStr = isMainInstance
+		// 	? async (value: TLicenseBlock) => await this.saveCertStr(value)
+		// 	: async () => {};
+		// const onFeatureChange = isMainInstance
+		// 	? async (features: TFeatures) => await this.onFeatureChange(features)
+		// 	: async () => {};
+		// const collectUsageMetrics = isMainInstance
+		// 	? async () => await this.licenseMetricsService.collectUsageMetrics()
+		// 	: async () => [];
+		// const collectPassthroughData = isMainInstance
+		// 	? async () => await this.licenseMetricsService.collectPassthroughData()
+		// 	: async () => ({});
+		//
+		// const renewalEnabled = this.renewalEnabled();
 
 		try {
-			this.manager = new LicenseManager({
-				server,
-				tenantId: this.globalConfig.license.tenantId,
-				productIdentifier: `n8n-${N8N_VERSION}`,
-				autoRenewEnabled: renewalEnabled,
-				renewOnInit: renewalEnabled,
-				autoRenewOffset,
-				offlineMode,
-				logger: this.logger,
-				loadCertStr: async () => await this.loadCertStr(),
-				saveCertStr,
-				deviceFingerprint: () => this.instanceSettings.instanceId,
-				collectUsageMetrics,
-				collectPassthroughData,
-				onFeatureChange,
-			});
+			// this.manager = new LicenseManager({
+			// 	server,
+			// 	tenantId: this.globalConfig.license.tenantId,
+			// 	productIdentifier: `n8n-${N8N_VERSION}`,
+			// 	autoRenewEnabled: renewalEnabled,
+			// 	renewOnInit: renewalEnabled,
+			// 	autoRenewOffset,
+			// 	offlineMode,
+			// 	logger: this.logger,
+			// 	loadCertStr: async () => await this.loadCertStr(),
+			// 	saveCertStr,
+			// 	deviceFingerprint: () => this.instanceSettings.instanceId,
+			// 	collectUsageMetrics,
+			// 	collectPassthroughData,
+			// 	onFeatureChange,
+			// });
 
-			await this.manager.initialize();
+			// await this.manager.initialize();
 			this.logger.debug('License initialized');
 		} catch (error: unknown) {
 			if (error instanceof Error) {
