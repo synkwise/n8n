@@ -1,4 +1,9 @@
-import { ICredentialType, INodeProperties, ICredentialTestRequest } from 'n8n-workflow';
+import {
+	ICredentialType,
+	INodeProperties,
+	ICredentialTestRequest,
+	IAuthenticateGeneric,
+} from 'n8n-workflow';
 
 export class SynkwiseApi implements ICredentialType {
 	name = 'synkwiseApi';
@@ -10,6 +15,7 @@ export class SynkwiseApi implements ICredentialType {
 			displayName: 'API Key',
 			name: 'apiKey',
 			type: 'string',
+			typeOptions: { password: true },
 			default: '',
 			required: true,
 		},
@@ -19,9 +25,9 @@ export class SynkwiseApi implements ICredentialType {
 			type: 'options',
 			options: [
 				{ name: 'Local (Custom)', value: 'custom' },
-				{ name: 'Test', value: 'https://api.synkwise.test' },
-				{ name: 'Stage', value: 'https://api.synkwise.stage' },
-				{ name: 'Production', value: 'https://api.synkwise.dev' },
+				{ name: 'Test', value: 'https://api.sos.synkwise.dev' },
+				{ name: 'Stage', value: 'https://api.sos.synkwise.net' },
+				{ name: 'Production', value: 'https://api.sos.synkwise.com' },
 			],
 			default: 'https://api.synkwise.dev',
 			description: 'Select the environment for Synkwise API',
@@ -41,15 +47,25 @@ export class SynkwiseApi implements ICredentialType {
 		},
 	];
 
+	authenticate: IAuthenticateGeneric = {
+		type: 'generic',
+		properties: {
+			headers: {
+				Authorization: '=Bearer {{$credentials.accessToken}}',
+			},
+		},
+	};
+
 	// ✅ Add a test connection feature
-	// test: ICredentialTestRequest = {
-	// 	request: {
-	// 		baseURL: '={{$credentials.environment === "custom" ? $credentials.customBaseUrl : $credentials.environment}}',
-	// 		url: '/health',
-	// 		method: 'GET',
-	// 		headers: {
-	// 			Authorization: 'Bearer {{$credentials.apiKey}}',
-	// 		},
-	// 	},
-	// };
+	test: ICredentialTestRequest = {
+		request: {
+			baseURL:
+				'={{$credentials.environment === "custom" ? $credentials.customBaseUrl : $credentials.environment}}',
+			url: 'api/internal/v1/health',
+			method: 'GET',
+			headers: {
+				'X-API-KEY': '={{$credentials.apiKey}}',
+			},
+		},
+	};
 }
