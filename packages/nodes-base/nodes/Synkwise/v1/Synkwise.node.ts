@@ -26,11 +26,6 @@ export class SynkwiseV1 implements INodeType {
 				{
 					name: 'synkwiseApi',
 					required: true,
-					displayOptions: {
-						show: {
-							authentication: ['accessToken'],
-						},
-					},
 				},
 			],
 			properties: [
@@ -61,11 +56,18 @@ export class SynkwiseV1 implements INodeType {
 		const items = this.getInputData();
 		const returnData: INodeExecutionData[] = [];
 		const length = items.length;
-		// let qs: IDataObject;
+
 		let responseData;
-		// const credentials = this.getNodeParameter('authentication', 0) as string;
+		const credentials = (await this.getCredentials('synkwiseApi')) as {
+			environment: string;
+			apiKey: string;
+			customBaseUrl: string;
+		};
 		const resource = this.getNodeParameter('resource', 0);
 		const operation = this.getNodeParameter('operation', 0);
+		const apiBaseUrl =
+			credentials.environment === 'custom' ? credentials.customBaseUrl : credentials.environment;
+		const apiKey = credentials.apiKey as string;
 
 		for (let i = 0; i < length; i++) {
 			try {
@@ -75,8 +77,18 @@ export class SynkwiseV1 implements INodeType {
 				// qs = {};
 				if (resource === 'resident') {
 					if (operation === 'resident.profile.get') {
-						// const residentId = this.getNodeParameter('residentId', i) as string;
-						responseData = [];
+						const residentId = this.getNodeParameter('residentId', i) as string;
+						const endpoint = `${apiBaseUrl}/api/internal/v1/residents/${residentId}`;
+						const residentProfile = await this.helpers.request({
+							method: 'GET',
+							url: endpoint,
+							headers: {
+								'X-API-KEY': apiKey,
+								'Content-Type': 'application/json',
+							},
+							json: true,
+						});
+						responseData = [residentProfile];
 					}
 				}
 

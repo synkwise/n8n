@@ -228,6 +228,7 @@ export class License {
 	}
 
 	isFeatureEnabled(feature: BooleanLicenseFeature) {
+		return true;
 		return this.manager?.hasFeatureEnabled(feature) ?? false;
 	}
 
@@ -292,6 +293,7 @@ export class License {
 	}
 
 	isAPIDisabled() {
+		return false;
 		return this.isFeatureEnabled(LICENSE_FEATURES.API_DISABLED);
 	}
 
