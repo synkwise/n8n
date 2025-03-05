@@ -9,6 +9,8 @@ import {
 	NodeConnectionType,
 } from 'n8n-workflow';
 import { residentFields, residentOperations } from './ResidentDescription';
+import { inspectionFields, inspectionOperations } from './InspectionDescription';
+import moment from 'moment-timezone';
 
 export class SynkwiseV1 implements INodeType {
 	description: INodeTypeDescription;
@@ -31,6 +33,8 @@ export class SynkwiseV1 implements INodeType {
 			properties: [
 				...residentOperations,
 				...residentFields,
+				...inspectionOperations,
+				...inspectionFields,
 				{
 					displayName: 'Resource',
 					name: 'resource',
@@ -40,6 +44,10 @@ export class SynkwiseV1 implements INodeType {
 						{
 							name: 'Resident',
 							value: 'resident',
+						},
+						{
+							name: 'Inspection',
+							value: 'inspection',
 						},
 					],
 					default: 'resident',
@@ -89,6 +97,29 @@ export class SynkwiseV1 implements INodeType {
 							json: true,
 						});
 						responseData = [residentProfile];
+					}
+				}
+
+				if (resource === 'inspection') {
+					if (operation === 'inspection.result.update') {
+						const executionId = this.getNodeParameter('executionId', i) as string;
+						const payload = this.getNodeParameter('payload', i) as {};
+						const endpoint = `${apiBaseUrl}/api/internal/v1/inspection/execs`;
+						const triggerOnUtc = moment().utc().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
+						await this.helpers.request({
+							method: 'POST',
+							url: endpoint,
+							headers: {
+								'X-API-KEY': apiKey,
+								'Content-Type': 'application/json',
+							},
+							json: true,
+							body: {
+								executionId,
+								payload,
+								triggerOnUtc,
+							},
+						});
 					}
 				}
 

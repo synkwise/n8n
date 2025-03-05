@@ -89,10 +89,9 @@ export class SynkwiseTrigger implements INodeType {
 		}
 
 		const eventType = req.body.event;
-		const residentId = req.body.resident_id;
 
 		// Validate Payload
-		if (!eventType || !residentId) {
+		if (!eventType) {
 			throw new Error('Invalid request: Missing required fields (event, resident_id)');
 		}
 
@@ -105,7 +104,6 @@ export class SynkwiseTrigger implements INodeType {
 					{
 						json: {
 							event: eventType,
-							residentId,
 						},
 					},
 				],
