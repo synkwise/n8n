@@ -51,4 +51,36 @@ export const inspectionFields: INodeProperties[] = [
 		required: true,
 		description: 'Execution Result Payload',
 	},
+	{
+		displayName: 'Workflow Status',
+		name: 'status',
+		type: 'options',
+		options: [
+			{
+				name: 'Workflow Started',
+				value: 'execution.status.started',
+			},
+			{
+				name: 'Workflow Is Running',
+				value: 'execution.status.running',
+			},
+			{
+				name: 'Workflow Succeeded',
+				value: 'execution.status.succeeded',
+			},
+			{
+				name: 'Workflow Failed',
+				value: 'execution.status.failed',
+			},
+		],
+		displayOptions: {
+			show: {
+				operation: ['inspection.result.update'],
+				resource: ['inspection'],
+			},
+		},
+		default: 'execution.status.running',
+		required: true,
+		description: 'Send Workflow Status To Synkwise',
+	},
 ];

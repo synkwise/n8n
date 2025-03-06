@@ -31,10 +31,6 @@ export class SynkwiseV1 implements INodeType {
 				},
 			],
 			properties: [
-				...residentOperations,
-				...residentFields,
-				...inspectionOperations,
-				...inspectionFields,
 				{
 					displayName: 'Resource',
 					name: 'resource',
@@ -52,6 +48,10 @@ export class SynkwiseV1 implements INodeType {
 					],
 					default: 'resident',
 				},
+				...residentOperations,
+				...residentFields,
+				...inspectionOperations,
+				...inspectionFields,
 			],
 		};
 	}
@@ -104,6 +104,7 @@ export class SynkwiseV1 implements INodeType {
 					if (operation === 'inspection.result.update') {
 						const executionId = this.getNodeParameter('executionId', i) as string;
 						const payload = this.getNodeParameter('payload', i) as {};
+						const status = this.getNodeParameter('status', i) as string;
 						const endpoint = `${apiBaseUrl}/api/internal/v1/inspection/execs`;
 						const triggerOnUtc = moment().utc().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
 						await this.helpers.request({
@@ -118,6 +119,7 @@ export class SynkwiseV1 implements INodeType {
 								executionId,
 								payload,
 								triggerOnUtc,
+								status,
 							},
 						});
 					}
