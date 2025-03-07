@@ -1,7 +1,7 @@
+import moment from 'moment-timezone';
 import {
 	type IDataObject,
-	type IExecuteFunctions,
-	ILoadOptionsFunctions,
+	type IExecuteFunctions, ILoadOptionsFunctions,
 	type INodeExecutionData,
 	INodeType,
 	type INodeTypeBaseDescription,
@@ -9,10 +9,10 @@ import {
 	type JsonObject,
 	NodeConnectionType,
 } from 'n8n-workflow';
-import { residentFields, residentOperations } from './ResidentDescription';
-import { inspectionFields, inspectionOperations } from './InspectionDescription';
-import moment from 'moment-timezone';
-import { getBaseUrl } from '../credentials-helper';
+import {documentFields, documentOperations} from './DocumentDescription';
+import {inspectionFields, inspectionOperations} from './InspectionDescription';
+import {residentFields, residentOperations} from './ResidentDescription';
+import {getBaseUrl} from "../credentials-helper";
 
 export class SynkwiseV1 implements INodeType {
 	description: INodeTypeDescription;
@@ -47,9 +47,15 @@ export class SynkwiseV1 implements INodeType {
 							name: 'Inspection',
 							value: 'inspection',
 						},
+						{
+							name: 'Document',
+							value: 'doc',
+						},
 					],
 					default: 'resident',
 				},
+				...documentOperations,
+				...documentFields,
 				...residentOperations,
 				...residentFields,
 				...inspectionOperations,
@@ -97,7 +103,7 @@ export class SynkwiseV1 implements INodeType {
 					})),
 				];
 			},
-			async getInspectionSystemFoldersOptions(this: ILoadOptionsFunctions) {
+			async getSystemDocumentsName(this: ILoadOptionsFunctions) {
 				const credentials = (await this.getCredentials('synkwiseApi')) as {
 					environment: string;
 					apiKey: string;
@@ -201,14 +207,34 @@ export class SynkwiseV1 implements INodeType {
 					}
 				}
 
+				if (resource === 'doc') {
+					if (operation === 'get') {
+						const filters = this.getNodeParameter('filters', i, {}) as IDataObject; // Extract all filters
+						const queryParams: IDataObject = {...filters};
+						const endpoint = `${apiBaseUrl}/api/internal/v1/documents/q`;
+						const docs = await this.helpers.request({
+							method: 'GET',
+							url: endpoint,
+							headers: {
+								'X-API-KEY': apiKey,
+								'Content-Type': 'application/json',
+							},
+							json: true,
+							qs: queryParams,
+						});
+
+						responseData = [docs];
+					}
+				}
+
 				const executionData = this.helpers.constructExecutionMetaData(
 					this.helpers.returnJsonArray(responseData as IDataObject[]),
-					{ itemData: { item: i } },
+					{itemData: {item: i}},
 				);
 				returnData.push(...executionData);
 			} catch (error) {
 				if (this.continueOnFail()) {
-					returnData.push({ json: { error: (error as JsonObject).message } });
+					returnData.push({json: {error: (error as JsonObject).message}});
 					continue;
 				}
 				throw error;
