@@ -83,4 +83,50 @@ export const inspectionFields: INodeProperties[] = [
 		required: true,
 		description: 'Send Workflow Status To Synkwise',
 	},
+	{
+		displayName: 'Inspection Error Name or ID',
+		name: 'inspectionError',
+		type: 'options',
+		typeOptions: {
+			loadOptionsMethod: 'getInspectionErrorsOptions',
+		},
+		options: [
+			{
+				name: 'None', // User-friendly label for "no selection"
+				value: '', // Unique value for the "empty" option
+			},
+		],
+		displayOptions: {
+			show: {
+				operation: ['inspection.result.update'],
+				resource: ['inspection'],
+			},
+		},
+		default: '',
+		description: 'Send Inspection Error (Optional)',
+		required: false,
+	},
+	{
+		displayName: 'System Folder',
+		name: 'systemFolder',
+		type: 'options',
+		typeOptions: {
+			loadOptionsMethod: 'getInspectionSystemFoldersOptions',
+		},
+		options: [
+			{
+				name: 'None', // User-friendly label for "no selection"
+				value: '', // Unique value for the "empty" option
+			},
+		],
+		displayOptions: {
+			show: {
+				operation: ['inspection.result.update'],
+				resource: ['inspection'],
+			},
+		},
+		default: '',
+		description: 'Configure Synkwise System Folder',
+		required: false,
+	},
 ];

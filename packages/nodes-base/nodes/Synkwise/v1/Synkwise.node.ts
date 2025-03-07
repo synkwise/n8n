@@ -1,6 +1,7 @@
 import {
 	type IDataObject,
 	type IExecuteFunctions,
+	ILoadOptionsFunctions,
 	type INodeExecutionData,
 	INodeType,
 	type INodeTypeBaseDescription,
@@ -11,6 +12,7 @@ import {
 import { residentFields, residentOperations } from './ResidentDescription';
 import { inspectionFields, inspectionOperations } from './InspectionDescription';
 import moment from 'moment-timezone';
+import { getBaseUrl } from '../credentials-helper';
 
 export class SynkwiseV1 implements INodeType {
 	description: INodeTypeDescription;
@@ -57,7 +59,82 @@ export class SynkwiseV1 implements INodeType {
 	}
 
 	methods = {
-		loadOptions: {},
+		loadOptions: {
+			async getInspectionErrorsOptions(this: ILoadOptionsFunctions) {
+				const credentials = (await this.getCredentials('synkwiseApi')) as {
+					environment: string;
+					apiKey: string;
+					customBaseUrl: string;
+				};
+				const apiBaseUrl = getBaseUrl(credentials);
+				const endpoint = `${apiBaseUrl}/api/internal/v1/inspection/options/errors`;
+				const apiKey = credentials.apiKey as string;
+
+				const response = await this.helpers.request({
+					method: 'GET',
+					url: endpoint,
+					headers: {
+						'X-API-KEY': apiKey,
+						'Content-Type': 'application/json',
+					},
+					json: true,
+				});
+
+				// Ensure response is an array
+				if (!Array.isArray(response)) {
+					throw new Error('Invalid response format from Synkwise API');
+				}
+
+				// Map response to n8n options format
+				return [
+					{
+						name: 'None',
+						value: '',
+					},
+					...response.map((error: { value: string; name: string }) => ({
+						name: error.name,
+						value: error.value,
+					})),
+				];
+			},
+			async getInspectionSystemFoldersOptions(this: ILoadOptionsFunctions) {
+				const credentials = (await this.getCredentials('synkwiseApi')) as {
+					environment: string;
+					apiKey: string;
+					customBaseUrl: string;
+				};
+				const apiBaseUrl = getBaseUrl(credentials);
+				const endpoint = `${apiBaseUrl}/api/internal/v1/inspection/options/system-folders`;
+				const apiKey = credentials.apiKey as string;
+
+				const response = await this.helpers.request({
+					method: 'GET',
+					url: endpoint,
+					headers: {
+						'X-API-KEY': apiKey,
+						'Content-Type': 'application/json',
+					},
+					json: true,
+				});
+
+				// Ensure response is an array
+				if (!Array.isArray(response)) {
+					throw new Error('Invalid response format from Synkwise API');
+				}
+
+				// Map response to n8n options format
+				return [
+					{
+						name: 'None',
+						value: '',
+					},
+					...response.map((error: { value: string; name: string }) => ({
+						name: error.name,
+						value: error.value,
+					})),
+				];
+			},
+		},
 	};
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
@@ -73,8 +150,7 @@ export class SynkwiseV1 implements INodeType {
 		};
 		const resource = this.getNodeParameter('resource', 0);
 		const operation = this.getNodeParameter('operation', 0);
-		const apiBaseUrl =
-			credentials.environment === 'custom' ? credentials.customBaseUrl : credentials.environment;
+		const apiBaseUrl = getBaseUrl(credentials);
 		const apiKey = credentials.apiKey as string;
 
 		for (let i = 0; i < length; i++) {
