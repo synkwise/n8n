@@ -173,7 +173,7 @@ export class SynkwiseV1 implements INodeType {
 						const filters = this.getNodeParameter('filters', i, {}) as IDataObject; // Extract all filters
 						const queryParams: IDataObject = { ...filters };
 						const endpoint = `${apiBaseUrl}/api/internal/v1/documents/q`;
-						const docs = await this.helpers.request({
+						const docs: any[] = await this.helpers.request({
 							method: 'GET',
 							url: endpoint,
 							headers: {
@@ -184,7 +184,7 @@ export class SynkwiseV1 implements INodeType {
 							qs: queryParams,
 						});
 
-						responseData = [docs];
+						responseData = [docs[0]];
 					}
 				}
 
