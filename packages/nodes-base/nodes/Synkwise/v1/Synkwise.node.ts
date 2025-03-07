@@ -1,16 +1,19 @@
+import moment from 'moment-timezone';
 import {
 	type IDataObject,
 	type IExecuteFunctions,
+	ILoadOptionsFunctions,
 	type INodeExecutionData,
+	INodePropertyOptions,
 	INodeType,
 	type INodeTypeBaseDescription,
 	INodeTypeDescription,
 	type JsonObject,
 	NodeConnectionType,
 } from 'n8n-workflow';
-import { residentFields, residentOperations } from './ResidentDescription';
+import { documentFields, documentOperations } from './DocumentDescription';
 import { inspectionFields, inspectionOperations } from './InspectionDescription';
-import moment from 'moment-timezone';
+import { residentFields, residentOperations } from './ResidentDescription';
 
 export class SynkwiseV1 implements INodeType {
 	description: INodeTypeDescription;
@@ -45,9 +48,15 @@ export class SynkwiseV1 implements INodeType {
 							name: 'Inspection',
 							value: 'inspection',
 						},
+						{
+							name: 'Document',
+							value: 'doc',
+						},
 					],
 					default: 'resident',
 				},
+				...documentOperations,
+				...documentFields,
 				...residentOperations,
 				...residentFields,
 				...inspectionOperations,
@@ -57,7 +66,41 @@ export class SynkwiseV1 implements INodeType {
 	}
 
 	methods = {
-		loadOptions: {},
+		loadOptions: {
+			async getSystemDocumentsName(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				const credentials = (await this.getCredentials('synkwiseApi')) as {
+					environment: string;
+					apiKey: string;
+					customBaseUrl: string;
+				};
+
+				const apiBaseUrl =
+					credentials.environment === 'custom'
+						? credentials.customBaseUrl
+						: credentials.environment;
+				const apiKey = credentials.apiKey as string;
+				const endpoint = `${apiBaseUrl}/api/internal/v1/inspection/options/system-folders`;
+
+				try {
+					const response = await this.helpers.request({
+						method: 'GET',
+						url: endpoint,
+						headers: {
+							'X-API-KEY': apiKey,
+							'Content-Type': 'application/json',
+						},
+						json: true,
+					});
+
+					return response.map((doc: { value: string; name: string }) => ({
+						name: doc.name,
+						value: doc.value,
+					}));
+				} catch (error) {
+					throw new Error(`Failed to fetch document names: ${(error as JsonObject).message}`);
+				}
+			},
+		},
 	};
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
@@ -122,6 +165,26 @@ export class SynkwiseV1 implements INodeType {
 								status,
 							},
 						});
+					}
+				}
+
+				if (resource === 'doc') {
+					if (operation === 'get') {
+						const filters = this.getNodeParameter('filters', i, {}) as IDataObject; // Extract all filters
+						const queryParams: IDataObject = { ...filters };
+						const endpoint = `${apiBaseUrl}/api/internal/v1/documents/q`;
+						const docs = await this.helpers.request({
+							method: 'GET',
+							url: endpoint,
+							headers: {
+								'X-API-KEY': apiKey,
+								'Content-Type': 'application/json',
+							},
+							json: true,
+							qs: queryParams,
+						});
+
+						responseData = [docs];
 					}
 				}
 
