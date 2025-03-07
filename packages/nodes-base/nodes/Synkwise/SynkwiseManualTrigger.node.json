@@ -1,0 +1,25 @@
+{
+	"node": "n8n-nodes-base.synkwiseManualTrigger",
+	"nodeVersion": "1.0",
+	"codexVersion": "1.0",
+	"categories": ["Compliance", "Synkwise Support", "Synkwise Intergartions"],
+	"resources": {
+		"credentialDocumentation": [
+			{
+				"url": ""
+			}
+		],
+		"primaryDocumentation": [
+			{
+				"url": ""
+			}
+		],
+		"generic": [
+			{
+				"label": "Automate & Customize Compliance Analysis rules",
+				"icon": "🚀",
+				"url": ""
+			}
+		]
+	}
+}
