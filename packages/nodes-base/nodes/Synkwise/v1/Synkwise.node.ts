@@ -220,9 +220,11 @@ export class SynkwiseV1 implements INodeType {
 				}
 
 				if (resource === 'doc') {
-					if (operation === 'get') {
+					// file = 0, folder = 1
+					if (operation === 'get-folders') {
 						const filters = this.getNodeParameter('filters', i, {}) as IDataObject; // Extract all filters
 						const queryParams: IDataObject = { ...filters };
+						queryParams.type = 1;
 						const endpoint = `${apiBaseUrl}/api/internal/v1/documents/q`;
 						const docs: any[] = await this.helpers.request({
 							method: 'GET',
@@ -236,6 +238,25 @@ export class SynkwiseV1 implements INodeType {
 						});
 
 						responseData = [docs[0]];
+					}
+
+					if (operation === 'get-files') {
+						const filters = this.getNodeParameter('filters', i, {}) as IDataObject; // Extract all filters
+						const queryParams: IDataObject = { ...filters };
+						queryParams.type = 0;
+						const endpoint = `${apiBaseUrl}/api/internal/v1/documents/q`;
+						const files: any[] = await this.helpers.request({
+							method: 'GET',
+							url: endpoint,
+							headers: {
+								'X-API-KEY': apiKey,
+								'Content-Type': 'application/json',
+							},
+							json: true,
+							qs: queryParams,
+						});
+
+						responseData = [files];
 					}
 				}
 

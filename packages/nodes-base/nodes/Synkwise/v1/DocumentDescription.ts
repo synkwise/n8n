@@ -13,13 +13,19 @@ export const documentOperations: INodeProperties[] = [
 		},
 		options: [
 			{
-				name: 'Get Documents',
-				value: 'get', // operation
-				description: 'Get Documents from Synkwise',
-				action: 'Get documents',
+				name: 'Get Folders',
+				value: 'get-folders', // operation
+				description: 'Get folders from Synkwise',
+				action: 'Get folders',
+			},
+			{
+				name: 'Get Files',
+				value: 'get-files',
+				description: 'Get files from Synkwise',
+				action: 'Get files',
 			},
 		],
-		default: 'get', // operation
+		default: 'get-folders', // operation
 	},
 ];
 
@@ -33,7 +39,7 @@ export const documentFields: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['doc'], // resource
-				operation: ['get'], // operation
+				operation: ['get-folders', 'get-files'], // operation
 			},
 		},
 		options: [
