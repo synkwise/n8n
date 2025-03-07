@@ -1,7 +1,8 @@
 import moment from 'moment-timezone';
 import {
 	type IDataObject,
-	type IExecuteFunctions, ILoadOptionsFunctions,
+	type IExecuteFunctions,
+	ILoadOptionsFunctions,
 	type INodeExecutionData,
 	INodeType,
 	type INodeTypeBaseDescription,
@@ -9,10 +10,10 @@ import {
 	type JsonObject,
 	NodeConnectionType,
 } from 'n8n-workflow';
-import {documentFields, documentOperations} from './DocumentDescription';
-import {inspectionFields, inspectionOperations} from './InspectionDescription';
-import {residentFields, residentOperations} from './ResidentDescription';
-import {getBaseUrl} from "../credentials-helper";
+import { documentFields, documentOperations } from './DocumentDescription';
+import { inspectionFields, inspectionOperations } from './InspectionDescription';
+import { residentFields, residentOperations } from './ResidentDescription';
+import { getBaseUrl } from '../credentials-helper';
 
 export class SynkwiseV1 implements INodeType {
 	description: INodeTypeDescription;
@@ -168,6 +169,10 @@ export class SynkwiseV1 implements INodeType {
 				if (resource === 'resident') {
 					if (operation === 'resident.profile.get') {
 						const residentId = this.getNodeParameter('residentId', i) as string;
+
+						const staticData = this.getWorkflowStaticData('global');
+						staticData.ownerId = residentId;
+
 						const endpoint = `${apiBaseUrl}/api/internal/v1/residents/${residentId}`;
 						const residentProfile = await this.helpers.request({
 							method: 'GET',
@@ -187,7 +192,12 @@ export class SynkwiseV1 implements INodeType {
 						const executionId = this.getNodeParameter('executionId', i) as string;
 						const payload = this.getNodeParameter('payload', i) as {};
 						const status = this.getNodeParameter('status', i) as string;
+						const staticData = this.getWorkflowStaticData('global');
+						const ruleId = staticData?.ruleId;
+						const ownerId = staticData?.ownerId;
+
 						const endpoint = `${apiBaseUrl}/api/internal/v1/inspection/execs`;
+
 						const triggerOnUtc = moment().utc().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
 						await this.helpers.request({
 							method: 'POST',
@@ -202,6 +212,8 @@ export class SynkwiseV1 implements INodeType {
 								payload,
 								triggerOnUtc,
 								status,
+								ruleId,
+								ownerId,
 							},
 						});
 					}
@@ -210,7 +222,7 @@ export class SynkwiseV1 implements INodeType {
 				if (resource === 'doc') {
 					if (operation === 'get') {
 						const filters = this.getNodeParameter('filters', i, {}) as IDataObject; // Extract all filters
-						const queryParams: IDataObject = {...filters};
+						const queryParams: IDataObject = { ...filters };
 						const endpoint = `${apiBaseUrl}/api/internal/v1/documents/q`;
 						const docs: any[] = await this.helpers.request({
 							method: 'GET',
@@ -229,12 +241,12 @@ export class SynkwiseV1 implements INodeType {
 
 				const executionData = this.helpers.constructExecutionMetaData(
 					this.helpers.returnJsonArray(responseData as IDataObject[]),
-					{itemData: {item: i}},
+					{ itemData: { item: i } },
 				);
 				returnData.push(...executionData);
 			} catch (error) {
 				if (this.continueOnFail()) {
-					returnData.push({json: {error: (error as JsonObject).message}});
+					returnData.push({ json: { error: (error as JsonObject).message } });
 					continue;
 				}
 				throw error;
