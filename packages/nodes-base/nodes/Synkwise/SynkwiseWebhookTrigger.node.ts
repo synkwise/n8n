@@ -6,16 +6,16 @@ import {
 	NodeConnectionType,
 } from 'n8n-workflow';
 
-export class SynkwiseTrigger implements INodeType {
+export class SynkwiseWebhookTrigger implements INodeType {
 	description: INodeTypeDescription = {
-		displayName: 'Synkwise Trigger',
-		name: 'synkwiseTrigger',
+		displayName: 'Synkwise Webhook Trigger',
+		name: 'synkwiseWebhookTrigger',
 		icon: 'file:synkwise.svg',
 		group: ['trigger'],
 		version: 1,
 		description: 'Triggers workflow execution based on Synkwise events',
 		defaults: {
-			name: 'Synkwise Trigger',
+			name: 'Synkwise Webhook Trigger',
 		},
 		inputs: [],
 		outputs: [NodeConnectionType.Main],
@@ -30,7 +30,7 @@ export class SynkwiseTrigger implements INodeType {
 				name: 'default',
 				httpMethod: 'POST',
 				responseMode: 'onReceived',
-				path: 'webhook',
+				path: '',
 			},
 		],
 		properties: [
@@ -43,7 +43,7 @@ export class SynkwiseTrigger implements INodeType {
 					{
 						name: 'Resident Document Upload',
 						value: 'resident.document.upload',
-						description: 'Occurs whenever a document is uploaded to resident profile',
+						description: 'Occurs whenever a document is uploaded to a resident profile',
 					},
 					{
 						name: 'Resident Careplan Created',
@@ -53,26 +53,9 @@ export class SynkwiseTrigger implements INodeType {
 						name: 'Resident Assessment Created',
 						value: 'resident.assessment.created',
 					},
-					{
-						name: 'Manual Execution',
-						value: 'manual',
-					},
 				],
 				default: 'resident.document.upload',
 				required: true,
-			},
-			{
-				displayName: 'Resident ID (For Manual Execution)',
-				name: 'residentId',
-				type: 'string',
-				default: '',
-				placeholder: '12345',
-				description: 'Enter Resident ID for manual execution',
-				displayOptions: {
-					show: {
-						event: ['manual'],
-					},
-				},
 			},
 		],
 	};
@@ -92,7 +75,7 @@ export class SynkwiseTrigger implements INodeType {
 
 		// Validate Payload
 		if (!eventType) {
-			throw new Error('Invalid request: Missing required fields (event, resident_id)');
+			throw new Error('Invalid request: Missing event type');
 		}
 
 		// Immediately Respond with HTTP 200
@@ -102,9 +85,7 @@ export class SynkwiseTrigger implements INodeType {
 			workflowData: [
 				[
 					{
-						json: {
-							event: eventType,
-						},
+						json: req.body,
 					},
 				],
 			],

@@ -1,5 +1,5 @@
 {
-	"node": "n8n-nodes-base.synkwiseTrigger",
+	"node": "n8n-nodes-base.synkwiseWebhookTrigger",
 	"nodeVersion": "1.0",
 	"codexVersion": "1.0",
 	"categories": ["Compliance", "Synkwise Support", "Synkwise Intergartions"],

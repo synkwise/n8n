@@ -820,7 +820,8 @@
       "dist/nodes/Transform/Sort/Sort.node.js",
       "dist/nodes/Transform/Summarize/Summarize.node.js",
       "dist/nodes/Synkwise/Synkwise.node.js",
-      "dist/nodes/Synkwise/SynkwiseTrigger.node.js"
+      "dist/nodes/Synkwise/SynkwiseManualTrigger.node.js",
+      "dist/nodes/Synkwise/SynkwiseWebhookTrigger.node.js"
     ]
   },
   "devDependencies": {
